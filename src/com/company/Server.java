@@ -32,6 +32,7 @@ public class Server implements Runnable {
             dp = new DatagramPacket(buf, 1024);
             try {
                 socket.receive(dp);
+                port = dp.getPort();
                 address = dp.getAddress();
                 String str = new String(dp.getData(), 0, dp.getLength());
 
@@ -39,6 +40,7 @@ public class Server implements Runnable {
                     name = str.substring(6);
                 }
                 if(str.startsWith("@quit")){
+                    System.out.println("Command exit!");
                     System.exit(1);
                 }
 
@@ -51,9 +53,13 @@ public class Server implements Runnable {
     }
 
     public void sendMessage(String msg){
-        DatagramPacket answer = new DatagramPacket(msg.getBytes(), msg.length(), address, dp.getPort());
+        DatagramPacket answer = new DatagramPacket(msg.getBytes(), msg.length(), address, port);
         try {
             socket.send(answer);
+            System.out.println("send port: " + port);
+            if(msg.startsWith("@quit")){
+                System.exit(1);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
